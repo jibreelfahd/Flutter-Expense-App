@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_apps/models/expense_blueprint.dart';
 import 'package:flutter_apps/widgets/expenses/expenses_list.dart';
 import 'package:flutter_apps/widgets/new_expense.dart';
+import 'package:flutter_apps/widgets/chart/chart.dart';
 
 class Expenses extends StatefulWidget {
   const Expenses({super.key});
@@ -16,13 +17,13 @@ class Expenses extends StatefulWidget {
 class _ExpenseState extends State<Expenses> {
   final List<Expense> _registeredExpenses = [
     Expense(
-      title: 'Flutter Course',
+      title: 'Italian Fried Dish',
       amount: 12.88,
       date: DateTime.now(),
       category: Category.food,
     ),
     Expense(
-      title: 'React Course',
+      title: 'React Meetings',
       amount: 44.3,
       date: DateTime.now(),
       category: Category.work,
@@ -36,9 +37,26 @@ class _ExpenseState extends State<Expenses> {
   }
 
   void _removeExpense(Expense expense) {
+    final expenseIndex = _registeredExpenses.indexOf(expense);
     setState(() {
       _registeredExpenses.remove(expense);
     });
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        content: const Text('Expense Deleted'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() {
+              _registeredExpenses.insert(expenseIndex, expense);
+            });
+          },
+        ),
+      ),
+    );
   }
 
   void _showAddExpenseOverlay() {
@@ -51,6 +69,19 @@ class _ExpenseState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    Widget mainContent = const Center(
+      child: Text(
+        'No expenses available, try adding some!',
+      ),
+    );
+
+    if (_registeredExpenses.isNotEmpty) {
+      mainContent = ExpensesList(
+        expenseData: _registeredExpenses,
+        onRemoveExpense: _removeExpense,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Flutter Expense Tracker'),
@@ -65,12 +96,9 @@ class _ExpenseState extends State<Expenses> {
       ),
       body: Column(
         children: [
-          const Text('Some texts here'),
+          Chart(expenses: _registeredExpenses),
           Expanded(
-            child: ExpensesList(
-              expenseData: _registeredExpenses,
-              onRemoveExpense: _removeExpense,
-            ),
+            child: mainContent,
           ),
         ],
       ),

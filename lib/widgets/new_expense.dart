@@ -19,7 +19,7 @@ class _NewExpenseState extends State<NewExpense> {
   Category _selectedCategory = Category.leisure;
   DateTime? _selectedDate;
 
-  void _showDatPicker() async {
+  void _showDatePicker() async {
     final now = DateTime.now();
     final firstDate = DateTime(now.year - 1, now.month, now.day);
     final pickedDate = await showDatePicker(
@@ -112,7 +112,7 @@ class _NewExpenseState extends State<NewExpense> {
                         : formatter.format(_selectedDate!),
                   ),
                   IconButton(
-                    onPressed: _showDatPicker,
+                    onPressed: _showDatePicker,
                     icon: const Icon(Icons.calendar_month),
                   ),
                 ],
